@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+		<PropertyGroup>
+				<TargetFramework>net6.0</TargetFramework>
+				<OutputType>Exe</OutputType>
+				<LangVersion>latest</LangVersion>
+				<ServerGarbageCollection>true</ServerGarbageCollection>
+				<ConcurrentGarbageCollection>true</ConcurrentGarbageCollection>
+		</PropertyGroup>
+
+		<ItemGroup>
+				<PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0" />
+				<PackageReference Include="Microsoft.Orleans.OrleansTelemetryConsumers.Counters" Version="3.6.2" />
+				<PackageReference Include="Microsoft.Orleans.Persistence.AzureStorage" Version="3.6.3" />
+				<PackageReference Include="OrleansDashboard.Core" Version="3.1.0" />
+		</ItemGroup>
+
+		<ItemGroup>
+				<ProjectReference Include="..\ONE.Common\ONE.Common.csproj" />
+				<ProjectReference Include="..\ONE.Silo\ONE.Silo.csproj" />
+				<ProjectReference Include="..\ONE.Web\ONE.Web.csproj" />
+		</ItemGroup>
+
+		<ItemGroup>
+				<None Update="appsettings.json">
+						<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+				</None>
+		</ItemGroup>
+	
+</Project>

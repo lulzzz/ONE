@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+			<TargetFramework>net6.0</TargetFramework>
+			<Nullable>enable</Nullable>
+			<OutputType>Library</OutputType>
+	 
+
+	  <!-- Because this web project is not an app and a library, we'll put all the static content 
+	        in a embedded resource and use that to serve pages from.-->
+	<GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+	<ProduceReferenceAssembly>True</ProduceReferenceAssembly>
+	<EnableNETAnalyzers>True</EnableNETAnalyzers>
+	<AnalysisLevel>latest</AnalysisLevel>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="wwwroot\**\*" />
+	</ItemGroup>
+
+  <ItemGroup>
+	<PackageReference Include="MessagePack" Version="2.4.35" />
+	<PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="6.0.5" />
+    <PackageReference Include="Microsoft.Orleans.Core" Version="3.6.2" />
+    <PackageReference Include="MQTTnet.AspNetCore" Version="3.1.2" />
+    <PackageReference Include="OrleansDashboard" Version="3.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ONE.DataAccess\ONE.DataAccess.csproj" />
+    <ProjectReference Include="..\ONE.GrainInterfaces\ONE.GrainInterfaces.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\" />
+  </ItemGroup>
+	
+</Project>

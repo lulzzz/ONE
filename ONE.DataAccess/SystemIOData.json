@@ -1,0 +1,9 @@
+[
+
+  {
+    "deviceInputOutputGuid": "e3a32a6e-52c3-421e-9acd-073da22519c5",
+    "deviceName": "EN4000Receiver",
+    "deviceInputOutputType": "EN4000Receiver",
+    "comPort": "COM1"
+  }
+]

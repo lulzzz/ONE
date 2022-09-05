@@ -1,0 +1,397 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Silo\\ONE.Silo.csproj": {}
+  },
+  "projects": {
+    "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Common\\ONE.Common.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Common\\ONE.Common.csproj",
+        "projectName": "ONE.Common",
+        "projectPath": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Common\\ONE.Common.csproj",
+        "packagesPath": "C:\\Users\\Technerds Solutions\\.nuget\\packages\\",
+        "outputPath": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Common\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\Technerds Solutions\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "MQTTnet.Extensions.ManagedClient": {
+              "target": "Package",
+              "version": "[3.1.2, )"
+            },
+            "NAudio": {
+              "target": "Package",
+              "version": "[2.1.0, )"
+            },
+            "System.Speech": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            },
+            "System.Windows.Extensions": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.303\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.DataAccess\\ONE.DataAccess.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.DataAccess\\ONE.DataAccess.csproj",
+        "projectName": "ONE.DataAccess",
+        "projectPath": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.DataAccess\\ONE.DataAccess.csproj",
+        "packagesPath": "C:\\Users\\Technerds Solutions\\.nuget\\packages\\",
+        "outputPath": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.DataAccess\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\Technerds Solutions\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {
+              "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Models\\ONE.Models.csproj": {
+                "projectPath": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Models\\ONE.Models.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.1, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.303\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.GrainInterfaces\\ONE.GrainInterfaces.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.GrainInterfaces\\ONE.GrainInterfaces.csproj",
+        "projectName": "ONE.GrainInterfaces",
+        "projectPath": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.GrainInterfaces\\ONE.GrainInterfaces.csproj",
+        "packagesPath": "C:\\Users\\Technerds Solutions\\.nuget\\packages\\",
+        "outputPath": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.GrainInterfaces\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\Technerds Solutions\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {
+              "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Common\\ONE.Common.csproj": {
+                "projectPath": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Common\\ONE.Common.csproj"
+              },
+              "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Models\\ONE.Models.csproj": {
+                "projectPath": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Models\\ONE.Models.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "Microsoft.Orleans.CodeGenerator.MSBuild": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[3.6.2, )"
+            },
+            "Microsoft.Orleans.Runtime.Abstractions": {
+              "target": "Package",
+              "version": "[3.6.2, )"
+            },
+            "UUIDNext": {
+              "target": "Package",
+              "version": "[1.1.1, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.303\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Models\\ONE.Models.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Models\\ONE.Models.csproj",
+        "projectName": "ONE.Models",
+        "projectPath": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Models\\ONE.Models.csproj",
+        "packagesPath": "C:\\Users\\Technerds Solutions\\.nuget\\packages\\",
+        "outputPath": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Models\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\Technerds Solutions\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {
+              "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Common\\ONE.Common.csproj": {
+                "projectPath": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Common\\ONE.Common.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "MessagePack.Annotations": {
+              "target": "Package",
+              "version": "[2.4.35, )"
+            },
+            "Microsoft.Orleans.Core.Abstractions": {
+              "target": "Package",
+              "version": "[3.6.2, )"
+            },
+            "System.Windows.Extensions": {
+              "target": "Package",
+              "version": "[6.0.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.303\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Silo\\ONE.Silo.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Silo\\ONE.Silo.csproj",
+        "projectName": "ONE.Silo",
+        "projectPath": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Silo\\ONE.Silo.csproj",
+        "packagesPath": "C:\\Users\\Technerds Solutions\\.nuget\\packages\\",
+        "outputPath": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Silo\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\Technerds Solutions\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {
+              "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.DataAccess\\ONE.DataAccess.csproj": {
+                "projectPath": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.DataAccess\\ONE.DataAccess.csproj"
+              },
+              "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.GrainInterfaces\\ONE.GrainInterfaces.csproj": {
+                "projectPath": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.GrainInterfaces\\ONE.GrainInterfaces.csproj"
+              },
+              "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Models\\ONE.Models.csproj": {
+                "projectPath": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Models\\ONE.Models.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "Microsoft.Orleans.CodeGenerator.MSBuild": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[3.6.2, )"
+            },
+            "Microsoft.Orleans.OrleansTelemetryConsumers.Counters": {
+              "target": "Package",
+              "version": "[3.6.2, )"
+            },
+            "Microsoft.Orleans.OrleansTelemetryConsumers.Linux": {
+              "target": "Package",
+              "version": "[3.6.2, )"
+            },
+            "Microsoft.Orleans.Server": {
+              "target": "Package",
+              "version": "[3.6.2, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.303\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "profiles": {
+
+    "OnPrem": {
+      "commandName": "Project",
+      "commandLineArgs": "--mode OnPrem --edgeGateway:DeviceId=413d3d96-3d2f-4b13-b17c-b6ebc898f47a"
+    },
+    "CloudLocal": {
+      "commandName": "Project",
+      "commandLineArgs": "--mode CloudLocal"
+    },
+    "WebOnly": {
+      "commandName": "Project",
+      "commandLineArgs": "--mode CloudLocal --services WebGateway"
+    },
+    "SiloOnly": {
+      "commandName": "Project",
+      "commandLineArgs": "--mode CloudLocal --services Silo"
+    }
+  }
+}

@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+		<PropertyGroup>
+				<TargetFramework>net6.0</TargetFramework>
+				<LangVersion>latest</LangVersion>
+		</PropertyGroup>
+
+		<ItemGroup>
+				<PackageReference Include="MessagePack" Version="2.4.35" />
+				<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
+				<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+				<PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
+				<PackageReference Include="MQTTnet.Extensions.ManagedClient" Version="3.1.2" />
+				<PackageReference Include="SerialPortStream" Version="2.4.0" />
+				<PackageReference Include="System.Windows.Extensions" Version="6.0.0" />
+		</ItemGroup>
+
+		<ItemGroup>
+				<ProjectReference Include="..\ONE.Common\ONE.Common.csproj" />
+				<ProjectReference Include="..\ONE.DataAccess\ONE.DataAccess.csproj" />
+				<ProjectReference Include="..\ONE.Models\ONE.Models.csproj" />
+		</ItemGroup>
+
+</Project>
