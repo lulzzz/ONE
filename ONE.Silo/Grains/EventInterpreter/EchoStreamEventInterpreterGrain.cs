@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
 using ONE.GrainInterfaces;
 using ONE.GrainInterfaces.EventInterpreter;
+using ONE.GrainInterfaces.EventProcessor;
 using ONE.Models.Domain;
 using ONE.Models.Enumerations;
+using ONE.Models.Initiator.ConfigurationData;
 using ONE.Models.Interpeter;
 using ONE.Models.MessageContracts;
 using Orleans;
@@ -58,7 +60,7 @@ namespace ONE.Silo.Grains.EventInterpreter
             var grain = GrainFactory.GetGrain<IEventInterpreterRouterGrain>($"{GrainId}_EventInterpreterRouter");
             List<InitiatorInfo> initiatorInfos = await grain.GetInterpreterInitiatorInfos();
 
-            InitiatorInfo? initiatorInfo = initiatorInfos.Where(x => x.ConfigurationData.SerialNumber == echoStreamMessage?.OriginatorUniqueId).FirstOrDefault();
+            InitiatorInfo? initiatorInfo = initiatorInfos.Where(x => x.ConfigurationData is EchoStreamConfigurationData && ((EchoStreamConfigurationData)x.ConfigurationData).SerialNumber == echoStreamMessage?.OriginatorUniqueId).FirstOrDefault();
 
             //Set the default event type
             List<TrackedEvent> trackedEventsToPublish = new List<TrackedEvent>();
@@ -144,9 +146,13 @@ namespace ONE.Silo.Grains.EventInterpreter
 
         public async Task SendEventMessageForProcessing(IONEEventMessage oneEventMessage)
         {
-            var streamProvider = GetStreamProvider(ONEStreams.DefaultProvider);
-            var eventStream = streamProvider.GetStream<IONEEventMessage>(GrainIdAsGuid, ONEStreams.EVENT_PROCESSOR);
-            await eventStream.OnNextAsync(oneEventMessage);
+            var grainId = $"{oneEventMessage.InitiatorGUID}/{oneEventMessage.EventFlowGUID}/{(int)oneEventMessage.EventType}";
+            IEventProcessor eventProcessor = GrainFactory.GetGrain<IEventProcessor>(grainId);
+
+            await eventProcessor.ProcessExecutionFlow(oneEventMessage);
+            //  var streamProvider = GetStreamProvider(ONEStreams.DefaultProvider);
+            //var eventStream = streamProvider.GetStream<IONEEventMessage>(grainId, ONEStreams.EVENT_PROCESSOR);
+            //await eventStream.OnNextAsync(oneEventMessage);
         }
     }
 }

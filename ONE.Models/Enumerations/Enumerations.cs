@@ -100,12 +100,11 @@ namespace ONE.Models.Enumerations
         NetworkCoordinator = 0x00
     }
 
-
-    public enum OutputActionType
+    public enum StatusType
     {
-        PlayOverDefaultAudioOutput,
-        PlayOverRadioOutput,
-        AddEventToDashboardOutput
+        Active = 1,
+        Deleted = 2,
+        Disabled = 3
     }
 
 }

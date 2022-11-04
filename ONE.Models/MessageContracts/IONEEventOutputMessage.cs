@@ -1,5 +1,4 @@
-﻿using ONE.Models.Enumerations;
-using System;
+﻿using System;
 
 namespace ONE.Models.MessageContracts
 {
@@ -7,7 +6,6 @@ namespace ONE.Models.MessageContracts
     public interface IONEEventOutputMessage
     {
         public Guid DeviceId { get; set; }
-        public OutputActionType OutputMessageType { get; set; }
         public byte[] Payload { get; set; }
     }
 }

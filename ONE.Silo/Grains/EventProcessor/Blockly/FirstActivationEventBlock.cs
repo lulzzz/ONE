@@ -1,13 +1,15 @@
 ﻿using ONE.Silo.Grains.OdinEventProcessorService.Blocks;
+using System.Threading.Tasks;
 
 namespace ONE.Silo.Grains.EventProcessor.Blockly
 {
-    [BlocklyConfigurationBlockInfo(BlockTypeName = "odin_event_first_activation")]
+    [BlocklyConfigurationBlockInfo(BlockTypeName = "one_event_first_activation")]
     public class FirstActivationEventBlock : ONEConfigurationEventBlock
     {
-        protected override void Execute()
+        protected override async Task Execute()
         {
             // Logger.Instance.LogDebug($"Executing FirstActivationEventBlock");
+            await Task.CompletedTask;
 
         }
     }

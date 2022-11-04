@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MQTTnet.AspNetCore.Extensions;
 using ONE.Common.Helpers;
+using ONE.DataAccess.Models;
+using ONE.DataAccess.Repositories;
 using ONE.GrainInterfaces;
 using ONE.HostedServices;
 using ONE.Odin.Web;
@@ -24,6 +27,11 @@ namespace ONE
         {
             Environment.CurrentDirectory = AppContext.BaseDirectory;
 
+            IConfigurationRoot configuration = new ConfigurationBuilder()
+           .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+           .AddJsonFile("appsettings.json")
+           .Build();
+
             // since we need a couple of options to use while configuring the host we'll use a dummy host and bind the options for that
             // so that is uses all the default config source like ENV vars, cmd line settings, config file etc
             var hostMode = Host.CreateDefaultBuilder(args).Build().Services.GetService<IConfiguration>().Get<ONEHostingOptions>();
@@ -41,9 +49,9 @@ namespace ONE
                         {
                             //o.Limits.KeepAliveTimeout = TimeSpan.FromMinutes(30);
 
-                            o.ListenAnyIP(1883, l => l.UseMqtt()); // MQTT pipeline
+                            //o.ListenAnyIP(1883, l => l.UseMqtt()); // MQTT pipeline
                             o.ListenAnyIP(8883, l => l.UseHttps().UseMqtt());
-
+                            o.ListenAnyIP(8083, l => l.UseMqtt());
                             // todo SSL on MQTT 8883?, this could be handled by ingress load balancer
 
                             // o.ListenAnyIP(5555); // custom TCP handler 
@@ -87,18 +95,19 @@ namespace ONE
                             gatewayPort,
                             new IPEndPoint(IPAddress.Loopback, 11111), "one_local", "one_local");
 
-                        silo.UseInMemoryReminderService();
+                        silo.UseAzureTableReminderService(options => options.ConnectionString = "DefaultEndpointsProtocol=https;AccountName=odindev001diag;AccountKey=+dKz9P6uZK1E6o2yEVzAjL0+2rvgF5wS2AEVt7AQ3P8Ik408CrQXPM8y1GE31ufKgqgH7sk8yqb+R8E8o0XizQ==;EndpointSuffix=core.windows.net");
                         silo.AddMemoryGrainStorageAsDefault();
                         silo.ConfigureApplicationParts(parts =>
-                           {
-                               parts.AddApplicationPart(typeof(IGrainMarker).Assembly).WithReferences();
-                           });
+                        {
+                            parts.AddApplicationPart(typeof(IGrainMarker).Assembly).WithReferences();
+                        });
                         silo.AddSimpleMessageStreamProvider(ONEStreams.DefaultProvider, configure =>
                         {
                             configure.OptimizeForImmutableData = true;
                             configure.PubSubType = Orleans.Streams.StreamPubSubType.ExplicitGrainBasedAndImplicit;
                         });
                         silo.AddMemoryGrainStorage("PubSubStore");  // special storage provider for stream subscriptions
+
                         silo.AddAzureBlobGrainStorage(
                         name: "oneDataStore",
                         configureOptions: options =>
@@ -126,9 +135,10 @@ namespace ONE
 
                 hostbuilder.ConfigureServices(services =>
                 {
-                    // once started boot any odin devices
-                    //services.AddHostedService<BootONESupervisorService>();
-
+                    services.AddDbContext<ONEContext>(o => o.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+                    services.AddScoped<IInitiatorRepository, InitiatorRepository>();
+                    services.AddScoped<IEventFlowRepository, EventFlowRepository>();
+                    services.AddScoped<IActiveEventFlowExecutionTrackingRepository, ActiveEventFlowExecutionTrackingRepository>();
                 });
             }
 
@@ -138,7 +148,7 @@ namespace ONE
                 hostbuilder.ConfigureServices((hostContext, services) =>
                 {
                     services.AddLogging();
-              
+
                 });
             }
 

@@ -1,34 +1,54 @@
 ﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using ONE.DataAccess.Repositories;
 using ONE.GrainInterfaces;
 using ONE.GrainInterfaces.EventProcessor;
+using ONE.Models.Domain;
 using ONE.Models.MessageContracts;
 using ONE.Silo.Grains.EventProcessor.Blockly;
 using ONE.Silo.Grains.OdinEventProcessorService.Blocks;
 using Orleans;
-using Orleans.Streams;
+using Orleans.Providers;
+using Orleans.Runtime;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
-using System.Xml.Linq;
 
 namespace ONE.Silo.Grains.EventProcessor
 {
     [ImplicitStreamSubscription(ONEStreams.EVENT_PROCESSOR)]
-    public class EventProcessorGrain : GrainBase, IEventProcessor
+    [StorageProvider(ProviderName = ONEStreams.EVENT_PROCESSOR)]
+    public class EventProcessorGrain : GrainBase, IRemindable, IEventProcessor
     {
+        private IGrainReminder _reminder = null;
         private Dictionary<string, Type> _configurationBlockTypeMap;
+        private IEventFlowRepository _eventFlowRepository = null;
+        private IActiveEventFlowExecutionTrackingRepository _activeEventFlowExecutionTrackingRepository = null;
+        private readonly IPersistentState<EventFlow> _eventFlow;
+
+
+        public EventProcessorGrain(IEventFlowRepository eventFlowRepository,
+            IActiveEventFlowExecutionTrackingRepository eventFlowActivationBlockTrackRepository,
+            [PersistentState("eventFlow", "oneDataStore")] IPersistentState<EventFlow> eventFlow)
+        {
+            _eventFlow = eventFlow;
+            _eventFlowRepository = eventFlowRepository;
+            _activeEventFlowExecutionTrackingRepository = eventFlowActivationBlockTrackRepository;
+        }
 
         public override async Task OnActivateAsync()
         {
             await base.OnActivateAsync();
 
-            var streamProvider = GetStreamProvider(ONEStreams.DefaultProvider);
-            var stream = streamProvider.GetStream<IONEEventMessage>(new Guid(GrainId), ONEStreams.EVENT_PROCESSOR);
-            await stream.SubscribeAsync(OnNextAsync);
+            // var streamProvider = GetStreamProvider(ONEStreams.DefaultProvider);
+            //var stream = streamProvider.GetStream<IONEEventMessage>(new Guid(GrainId), ONEStreams.EVENT_PROCESSOR);
+            // await stream.SubscribeAsync(OnNextAsync);
         }
 
         public Task OnCompletedAsync()
@@ -44,25 +64,74 @@ namespace ONE.Silo.Grains.EventProcessor
         }
 
 
-        public async Task OnNextAsync(IONEEventMessage oneEventMessage, StreamSequenceToken? token = null)
+        public async Task ProcessExecutionFlow(IONEEventMessage oneEventMessage)
         {
-            Logger.LogInformation("InitiateFlow");
-            XDocument myxml = XDocument.Load(@"C:\Work\AWC\AWC 4.0\ONE\ONE.Silo\Grains\EventProcessor\TestXmlBlock\FirstActivation.xml");
-            InitiateFlow(myxml.ToString(), oneEventMessage);
+            Logger.LogInformation("ProcessExecutionFlow");
+
+            EventFlowInfo eventFlowInfo = _eventFlowRepository.GetEventFlowInfoByEventFlowGuid(oneEventMessage.EventFlowGUID);
+            ActiveEventFlowExecutionTrackingInfo activeEventFlowExecutionTrackingInfo = new ActiveEventFlowExecutionTrackingInfo();
+            activeEventFlowExecutionTrackingInfo.InitiatorGuid = oneEventMessage.InitiatorGUID;
+            activeEventFlowExecutionTrackingInfo.EventFlowGuid = oneEventMessage.EventFlowGUID;
+            activeEventFlowExecutionTrackingInfo.EventTypeCode = (int)oneEventMessage.EventType;
+            activeEventFlowExecutionTrackingInfo.EventFlowXml = eventFlowInfo.EventFlowXML;
+            activeEventFlowExecutionTrackingInfo.GlobalTrackingGuid = oneEventMessage.GlobalTrackingGuid;
+            activeEventFlowExecutionTrackingInfo.EventInstanceGuid = oneEventMessage.EventInstanceGUID;
+            activeEventFlowExecutionTrackingInfo.EventData = oneEventMessage.Payload.ToString();
+            activeEventFlowExecutionTrackingInfo.TriggeredByEventFlowInstanceGuid = oneEventMessage.EventInstanceGUID;
+            activeEventFlowExecutionTrackingInfo.EventFlowLogDetailXml = oneEventMessage.EventFlowLogDetailXML;
+            activeEventFlowExecutionTrackingInfo.HaltedByEventFlowInstanceGuid = oneEventMessage.HaltedByEventFlowInstanceGUID;
+            activeEventFlowExecutionTrackingInfo.StopAudioOnEventFlowHalt = oneEventMessage.StopAudioOnEventFlowHalt;
+            _activeEventFlowExecutionTrackingRepository.AddActiveEventFlowExecutionTracking(activeEventFlowExecutionTrackingInfo);
+
+            string grainReminderName = $"{activeEventFlowExecutionTrackingInfo.InitiatorGuid}/{activeEventFlowExecutionTrackingInfo.EventFlowGuid}/{activeEventFlowExecutionTrackingInfo.EventTypeCode}/reminder";
+            _reminder = await RegisterOrUpdateReminder(grainReminderName, TimeSpan.FromSeconds(3), TimeSpan.FromMinutes(1));
+
         }
+
+        public async Task ReceiveReminder(string reminderName, TickStatus status)
+        {
+            string[] splitReminderName = reminderName.Split('/');
+            string initiatorGuid = splitReminderName[0];
+            string eventFlowGuid = splitReminderName[1];
+            string eventTypeCode = splitReminderName[2];
+
+            ActiveEventFlowExecutionTrackingInfo activeEventFlowExecutionTrackingInfo = new ActiveEventFlowExecutionTrackingInfo();
+            activeEventFlowExecutionTrackingInfo.InitiatorGuid = new Guid(initiatorGuid);
+            activeEventFlowExecutionTrackingInfo.EventFlowGuid = new Guid(eventFlowGuid);
+            activeEventFlowExecutionTrackingInfo.EventTypeCode = Convert.ToInt32(eventTypeCode);
+
+            ActiveEventFlowExecutionTrackingInfo activeEventFlowExecutionTrack = _activeEventFlowExecutionTrackingRepository.GetActiveEventFlowExecutionTracking(activeEventFlowExecutionTrackingInfo);
+
+            if (activeEventFlowExecutionTrack != null)
+            {
+                IONEEventMessage oneEventMessage = new ONEEventMessage();
+                oneEventMessage.EventFlowGUID = activeEventFlowExecutionTrack.EventFlowGuid;
+                oneEventMessage.EventFlowLogDetailXML = activeEventFlowExecutionTrack.EventFlowLogDetailXml;
+                oneEventMessage.EventInstanceGUID = activeEventFlowExecutionTrack.EventInstanceGuid;
+                oneEventMessage.EventType = (ONE.Models.Enumerations.EventType)activeEventFlowExecutionTrack.EventTypeCode;
+                oneEventMessage.GlobalTrackingGuid = activeEventFlowExecutionTrack.GlobalTrackingGuid;
+                oneEventMessage.HaltedByEventFlowInstanceGUID = activeEventFlowExecutionTrack.HaltedByEventFlowInstanceGuid;
+                oneEventMessage.InitiatorGUID = activeEventFlowExecutionTrack.InitiatorGuid;
+                oneEventMessage.StopAudioOnEventFlowHalt = activeEventFlowExecutionTrack.StopAudioOnEventFlowHalt;
+                oneEventMessage.TriggeredByEventFlowInstanceGUID = activeEventFlowExecutionTrack.TriggeredByEventFlowInstanceGuid;
+                await InitiateFlow(activeEventFlowExecutionTrack.EventFlowXml, oneEventMessage, activeEventFlowExecutionTrack);
+            }
+        }
+
+
 
         /// <summary>
         /// Initiates the flow.
         /// </summary>
         /// <param name="flowConfigurationXml">The flow configuration XML.</param>
         /// <param name="message">The message.</param>
-        public void InitiateFlow(string flowConfigurationXml, IONEEventMessage oneEventMessage)
+        public async Task InitiateFlow(string flowConfigurationXml, IONEEventMessage oneEventMessage, ActiveEventFlowExecutionTrackingInfo activeEventFlowExecutionTrack)
         {
             try
             {
                 //Extract the block type name, it should be the event type name strnig with the capitals replaced with an underscore and the odin_event prefix added
                 //such that CapCodeTextMessageReceived becomes odin_event_cap_code_text_message_received
-                string blockTypeName = string.Format("odin_event{0}", Regex.Replace(oneEventMessage.EventType.ToString(), "[A-Z]", "_$0").ToLower());
+                string blockTypeName = string.Format("one_event{0}", Regex.Replace(oneEventMessage.EventType.ToString(), "[A-Z]", "_$0").ToLower());
 
                 //Logger.Instance.LogDebug($"Initiating Event Flow from Event: {blockTypeName}: InitiatorGUID {message.InitiatorGUID} - EventFlowGUID: {message.EventFlowGUID}");
                 XmlDocument doc = new XmlDocument();
@@ -78,10 +147,6 @@ namespace ONE.Silo.Grains.EventProcessor
                 //Check to make sure we could find a root event
                 if (rootEventBlockXmlNode != null)
                 {
-
-
-
-
                     //Build the Configuration Block flow graph under the root event block
                     ONEConfigurationEventBlock rootEventBlock = BuildConfigurationBlockFlowGraph(rootEventBlockXmlNode, nsmgr) as ONEConfigurationEventBlock;
                     rootEventBlock.ONEEventMessage = oneEventMessage;
@@ -92,15 +157,26 @@ namespace ONE.Silo.Grains.EventProcessor
 
                     //Set the root event block for all of the child blocks
                     SetRootEventBlock(rootEventBlock, rootEventBlock);
+
+                    if (activeEventFlowExecutionTrack.EventFlowState != null)
+                    {
+                        await BuildONEEventFlowVariableDictionary(rootEventBlock, activeEventFlowExecutionTrack);
+                        await CreateRootEventBlock(rootEventBlock, activeEventFlowExecutionTrack);
+                    }
+
                     //Create a new event flow for the root event block and add it to the active event flows
                     EventFlow flowToInitiate = new EventFlow(rootEventBlock, oneEventMessage.GlobalTrackingGuid, oneEventMessage.EventInstanceGUID, oneEventMessage.EventFlowGUID, oneEventMessage.InitiatorGUID, oneEventMessage.EventType, flowConfigurationXml);
+
+                    //_eventFlow.State = flowToInitiate;
+
+                    //await _eventFlow.WriteStateAsync();
                     flowToInitiate.EventFlowCompleted += FlowToInitiate_EventFlowCompleted;
                     //  _activeEventFlows.Add(flowToInitiate);
 
-
-
                     //Initate the flow
-                    flowToInitiate.EventFlowTask.Start();
+                    //  flowToInitiate.EventFlowTask.Start();
+
+                    await flowToInitiate.ExecuteFlow();
                 }
                 else
                 {
@@ -118,7 +194,178 @@ namespace ONE.Silo.Grains.EventProcessor
 
 
 
+
+        #region Event Flow Blocky State Building
+
+
+        /// <summary>
+        /// /Find the Active Block ID in rootEventBlock 
+        /// Build the State and set the Next Execution Block
+        /// </summary>
+        /// <param name="rootEventBlock"></param>
+        /// <param name="activeEventFlowExecutionTrack"></param>
+        private async Task CreateRootEventBlock(ONEConfigurationEventBlock? rootEventBlock, ActiveEventFlowExecutionTrackingInfo activeEventFlowExecutionTrack)
+        {
+
+            await FindNextExecutionBlock(rootEventBlock, activeEventFlowExecutionTrack);
+
+            await CreateRootEventNextBlock(rootEventBlock.NextBlock, rootEventBlock, activeEventFlowExecutionTrack);
+
+
+        }
+
+        /// <summary>
+        /// If the Active Block ID not found in RootBlock
+        /// Check in Next Block using Recursive function
+        /// </summary>
+        /// <param name="nextBlock"></param>
+        /// <param name="rootEventBlock"></param>
+        /// <param name="activeEventFlowExecutionTrackingInfo"></param>
+        private async Task CreateRootEventNextBlock(ONEConfigurationBlock? nextBlock, ONEConfigurationEventBlock? rootEventBlock, ActiveEventFlowExecutionTrackingInfo activeEventFlowExecutionTrackingInfo)
+        {
+            if (nextBlock != null)
+            {
+                await FindNextExecutionBlock(nextBlock, rootEventBlock, activeEventFlowExecutionTrackingInfo);
+                await CreateRootEventNextBlock(nextBlock.NextBlock, rootEventBlock, activeEventFlowExecutionTrackingInfo);
+            }
+        }
+
+        private Task FindNextExecutionBlock(ONEConfigurationBlock? nextBlock, ONEConfigurationEventBlock? rootEventBlock, ActiveEventFlowExecutionTrackingInfo activeEventFlowExecutionTrackingInfo)
+        {
+            dynamic dynJson = JsonConvert.DeserializeObject(activeEventFlowExecutionTrackingInfo.EventFlowState);
+            if (dynJson != null)
+            {
+                if (nextBlock.Id == dynJson["ActiveEventFlowExecutionTrackingId"].Value.ToString())
+                {
+                    var activeBlockTrackingJson = dynJson[dynJson["ActiveEventFlowExecutionTrackingId"].Value.ToString()];
+                    if (activeBlockTrackingJson != null)
+                    {
+                        foreach (var element in nextBlock.GetType().GetProperties())
+                        {
+                            if (element.GetCustomAttribute(typeof(BlocklyConfigurationFieldInfoAttribute)) != null)
+                            {
+                                var converter = TypeDescriptor.GetConverter(element.PropertyType);
+                                var convertedObject = converter.ConvertFromString(Convert.ToString(activeBlockTrackingJson.Value[element.Name]));
+                                element.SetValue(nextBlock, convertedObject, null);
+                            }
+                        }
+
+                    }
+                    rootEventBlock.NextBlock = nextBlock;
+                }
+                else
+                {
+                    foreach (var element in nextBlock.GetType().GetProperties())
+                    {
+                        if (element.GetValue(nextBlock, null)?.GetType() == typeof(ONEConfigurationBlockStatement))
+                        {
+                            ONEConfigurationBlockStatement oneConfigurationBlockStatement = element.GetValue(nextBlock, null) as ONEConfigurationBlockStatement;
+
+                            if (FindIdInConfigurationBlockStatement(oneConfigurationBlockStatement, dynJson["ActiveEventFlowExecutionTrackingId"].Value.ToString()))
+                            {
+                                var activeBlockTrackingJson = dynJson[nextBlock.Id].Value;
+
+                                foreach (var statementBlock in nextBlock.GetType().GetProperties())
+                                {
+                                    if (statementBlock.GetCustomAttribute(typeof(BlocklyConfigurationFieldInfoAttribute)) != null)
+                                    {
+                                        var converter = TypeDescriptor.GetConverter(statementBlock.PropertyType);
+                                        var convertedObject = converter.ConvertFromString(Convert.ToString(activeBlockTrackingJson[statementBlock.Name].Value));
+                                        statementBlock.SetValue(nextBlock, convertedObject, null);
+                                    }
+                                }
+                                rootEventBlock.NextBlock = nextBlock;
+                            }
+                        }
+                    }
+                }
+
+            }
+            return Task.CompletedTask;
+        }
+
+        public bool FindIdInConfigurationBlockStatement(ONEConfigurationBlockStatement oneConfigurationBlockStatement, string activeEventFlowExecutionTrackingId)
+        {
+            if (oneConfigurationBlockStatement.FirstStatementBlock.Id == activeEventFlowExecutionTrackingId)
+            {
+                return true;
+            }
+            else
+            {
+                if (oneConfigurationBlockStatement.FirstStatementBlock.NextBlock != null)
+                {
+                    return RecursiveConfigurationBlockStatement(oneConfigurationBlockStatement.FirstStatementBlock.NextBlock, activeEventFlowExecutionTrackingId);
+                }
+            }
+            return false;
+        }
+
+        private bool RecursiveConfigurationBlockStatement(ONEConfigurationBlock nextBlock, string Id)
+        {
+            if (nextBlock.Id == Id)
+            {
+                return true;
+            }
+            if (nextBlock.NextBlock != null)
+            {
+                RecursiveConfigurationBlockStatement(nextBlock.NextBlock, Id);
+            }
+            return false;
+        }
+
+        private Task FindNextExecutionBlock(ONEConfigurationEventBlock? rootEventBlock, ActiveEventFlowExecutionTrackingInfo activeEventFlowExecutionTrackingInfo)
+        {
+            dynamic dynJson = JsonConvert.DeserializeObject(activeEventFlowExecutionTrackingInfo.EventFlowState);
+
+            if (dynJson != null)
+            {
+                if (rootEventBlock.Id == dynJson["ActiveEventFlowExecutionTrackingId"].Value.ToString())
+                {
+                    rootEventBlock = rootEventBlock;
+                }
+            }
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Rebuilding ONE EventFlow Variable Dictionary
+        /// </summary>
+        /// <param name="rootEventBlock"></param>
+        /// <param name="activeEventFlowExecutionTrackingInfo"></param>
+        public Task BuildONEEventFlowVariableDictionary(ONEConfigurationEventBlock rootEventBlock, ActiveEventFlowExecutionTrackingInfo activeEventFlowExecutionTrackingInfo)
+        {
+            dynamic dynJson = JsonConvert.DeserializeObject(activeEventFlowExecutionTrackingInfo.EventFlowState);
+
+            if (rootEventBlock.ONEEventFlowVariableDictionary == null)
+            {
+                rootEventBlock.ONEEventFlowVariableDictionary = new ConcurrentDictionary<string, ONEEventFlowVariable>();
+            }
+
+            if (dynJson != null)
+            {
+                foreach (var item in dynJson)
+                {
+                    var first = item.First["Value"];
+                    if (Convert.ToString(first.Type) == typeof(string).Name)
+                    {
+                        string value = Convert.ToString(first.Value);
+                        Type shellPropertyType = typeof(ONEEventFlowVariable<>).MakeGenericType(typeof(string));
+                        object oneEventFlowVariableInstance = Activator.CreateInstance(shellPropertyType);
+                        PropertyInfo oneEventFlowVariableProp = oneEventFlowVariableInstance.GetType().GetProperty("Value");
+                        oneEventFlowVariableProp.SetValue(oneEventFlowVariableInstance, value, null);
+                        rootEventBlock.ONEEventFlowVariableDictionary.TryAdd(Convert.ToString(item.Name), oneEventFlowVariableInstance as ONEEventFlowVariable);
+
+                    }
+                }
+            }
+            return Task.CompletedTask;
+        }
+
+        #endregion
+
+
         #region Event Flow Blockly Block Building
+
 
         /// <summary>
         /// Builds the configuration block chain.
@@ -164,7 +411,7 @@ namespace ONE.Silo.Grains.EventProcessor
 
             //Return a new instance of that type
             ONEConfigurationBlock currentBlock = Activator.CreateInstance(odinConfigurationBlockType) as ONEConfigurationBlock;
-
+            currentBlock.Id = currentNode.Attributes["id"].Value;
             //Check to see if there are any statement nodes, and if so build those up
             XmlNodeList statementNodes = currentNode.SelectNodes("./ns:statement", nsmgr);
             if (statementNodes != null && statementNodes.Count > 0)

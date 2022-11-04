@@ -1,7 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
-using ONE.DataAccess;
+using ONE.DataAccess.Repositories;
 using ONE.GrainInterfaces.EventInterpreter;
 using ONE.Models.Domain;
+using ONE.Models.Initiator.ConfigurationData;
 using Orleans.Runtime;
 using System;
 using System.Collections.Generic;
@@ -14,17 +15,18 @@ namespace ONE.Silo.Grains.EventInterpreter
     {
 
         private readonly IPersistentState<List<InitiatorInfo>> _initiatorInfos;
+        private IInitiatorRepository _initiatorRepository = null;
 
-        public EventInterpreterRouterGrain([PersistentState("initiatorInfos", "oneDataStore")] IPersistentState<List<InitiatorInfo>> initiatorInfos)
+        public EventInterpreterRouterGrain([PersistentState("initiatorInfos", "oneDataStore")] IPersistentState<List<InitiatorInfo>> initiatorInfos, IInitiatorRepository initiatorRepository)
         {
             _initiatorInfos = initiatorInfos;
+            _initiatorRepository = initiatorRepository;
         }
 
         public override async Task OnActivateAsync()
         {
             await base.OnActivateAsync();
-            InitiatorRepository initiatorRepository = new InitiatorRepository();
-            _initiatorInfos.State = initiatorRepository.GetInterpreterInitiatorInfo();
+            _initiatorInfos.State = _initiatorRepository.GetAllInitiatorInfos();
             await _initiatorInfos.WriteStateAsync();
         }
 
@@ -49,7 +51,7 @@ namespace ONE.Silo.Grains.EventInterpreter
             string eventInterpreterTypeEnumName = string.Empty;
             List<InitiatorInfo> initiatorInfoList = Task.FromResult(_initiatorInfos.State).Result;
 
-            InitiatorInfo? initiatorInfo = initiatorInfoList.Where(x => x.ConfigurationData.SerialNumber == serialNumber).FirstOrDefault();
+            InitiatorInfo? initiatorInfo = initiatorInfoList.Where(x => x.ConfigurationData is EchoStreamConfigurationData && ((EchoStreamConfigurationData)x.ConfigurationData).SerialNumber == serialNumber).FirstOrDefault();
 
             if (initiatorInfo != null)
             {

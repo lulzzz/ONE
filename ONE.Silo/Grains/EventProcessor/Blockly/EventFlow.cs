@@ -10,6 +10,11 @@ namespace ONE.Silo.Grains.EventProcessor.Blockly
     public class EventFlow
     {
 
+        public EventFlow()
+        {
+
+        }
+
         /// <summary>
         /// Occurs when [event flow completed].
         /// </summary>
@@ -21,6 +26,9 @@ namespace ONE.Silo.Grains.EventProcessor.Blockly
         /// <value>
         /// The root event block.
         /// </value>
+        /// 
+
+
         public ONEConfigurationEventBlock RootEventBlock
         {
             get
@@ -76,10 +84,17 @@ namespace ONE.Silo.Grains.EventProcessor.Blockly
             rootEventBlock.EventFlow = this;
 
             //Set the event flow task
-            EventFlowTask = new Task(() => { _rootEventBlock.ExecuteFlow(); });
+            // EventFlowTask = new Task(() => { _rootEventBlock.ExecuteFlow(); });
 
             //Continue with the on event flow completed 
-            EventFlowTask.ContinueWith((i) => { OnEventFlowCompleted(EventArgs.Empty); });
+            //EventFlowTask.ContinueWith((i) => { OnEventFlowCompleted(EventArgs.Empty); });
+        }
+
+
+        public async Task ExecuteFlow()
+        {
+            await _rootEventBlock.ExecuteFlow();
+            OnEventFlowCompleted(EventArgs.Empty);
         }
 
         /// <summary>

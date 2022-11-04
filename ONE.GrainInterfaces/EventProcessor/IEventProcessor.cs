@@ -1,11 +1,13 @@
 ﻿using ONE.Models.MessageContracts;
 using Orleans;
-using Orleans.Streams;
+using Orleans.Concurrency;
+using System.Threading.Tasks;
 
 namespace ONE.GrainInterfaces.EventProcessor
 {
-    public interface IEventProcessor : IGrainWithStringKey, IAsyncObserver<IONEEventMessage>
+    public interface IEventProcessor : IGrainWithStringKey
     {
-
+        [AlwaysInterleave]
+        Task ProcessExecutionFlow(IONEEventMessage oneEventMessage);
     }
 }

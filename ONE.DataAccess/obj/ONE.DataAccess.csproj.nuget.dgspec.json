@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.DataAccess\\ONE.DataAccess.csproj": {}
+    "C:\\Work\\AWC\\AWC 4.0\\GitHub\\ONE.DataAccess\\ONE.DataAccess.csproj": {}
   },
   "projects": {
-    "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Common\\ONE.Common.csproj": {
+    "C:\\Work\\AWC\\AWC 4.0\\GitHub\\ONE.Common\\ONE.Common.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Common\\ONE.Common.csproj",
+        "projectUniqueName": "C:\\Work\\AWC\\AWC 4.0\\GitHub\\ONE.Common\\ONE.Common.csproj",
         "projectName": "ONE.Common",
-        "projectPath": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Common\\ONE.Common.csproj",
+        "projectPath": "C:\\Work\\AWC\\AWC 4.0\\GitHub\\ONE.Common\\ONE.Common.csproj",
         "packagesPath": "C:\\Users\\Technerds Solutions\\.nuget\\packages\\",
-        "outputPath": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Common\\obj\\",
+        "outputPath": "C:\\Work\\AWC\\AWC 4.0\\GitHub\\ONE.Common\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -76,18 +76,18 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.303\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.305\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.DataAccess\\ONE.DataAccess.csproj": {
+    "C:\\Work\\AWC\\AWC 4.0\\GitHub\\ONE.DataAccess\\ONE.DataAccess.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.DataAccess\\ONE.DataAccess.csproj",
+        "projectUniqueName": "C:\\Work\\AWC\\AWC 4.0\\GitHub\\ONE.DataAccess\\ONE.DataAccess.csproj",
         "projectName": "ONE.DataAccess",
-        "projectPath": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.DataAccess\\ONE.DataAccess.csproj",
+        "projectPath": "C:\\Work\\AWC\\AWC 4.0\\GitHub\\ONE.DataAccess\\ONE.DataAccess.csproj",
         "packagesPath": "C:\\Users\\Technerds Solutions\\.nuget\\packages\\",
-        "outputPath": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.DataAccess\\obj\\",
+        "outputPath": "C:\\Work\\AWC\\AWC 4.0\\GitHub\\ONE.DataAccess\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -108,8 +108,8 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Models\\ONE.Models.csproj": {
-                "projectPath": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Models\\ONE.Models.csproj"
+              "C:\\Work\\AWC\\AWC 4.0\\GitHub\\ONE.Models\\ONE.Models.csproj": {
+                "projectPath": "C:\\Work\\AWC\\AWC 4.0\\GitHub\\ONE.Models\\ONE.Models.csproj"
               }
             }
           }
@@ -124,6 +124,16 @@
         "net6.0": {
           "targetAlias": "net6.0",
           "dependencies": {
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[6.0.10, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[6.0.10, )"
+            },
             "Newtonsoft.Json": {
               "target": "Package",
               "version": "[13.0.1, )"
@@ -144,18 +154,18 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.303\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.305\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Models\\ONE.Models.csproj": {
+    "C:\\Work\\AWC\\AWC 4.0\\GitHub\\ONE.Models\\ONE.Models.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Models\\ONE.Models.csproj",
+        "projectUniqueName": "C:\\Work\\AWC\\AWC 4.0\\GitHub\\ONE.Models\\ONE.Models.csproj",
         "projectName": "ONE.Models",
-        "projectPath": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Models\\ONE.Models.csproj",
+        "projectPath": "C:\\Work\\AWC\\AWC 4.0\\GitHub\\ONE.Models\\ONE.Models.csproj",
         "packagesPath": "C:\\Users\\Technerds Solutions\\.nuget\\packages\\",
-        "outputPath": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Models\\obj\\",
+        "outputPath": "C:\\Work\\AWC\\AWC 4.0\\GitHub\\ONE.Models\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -176,8 +186,8 @@
           "net6.0": {
             "targetAlias": "net6.0",
             "projectReferences": {
-              "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Common\\ONE.Common.csproj": {
-                "projectPath": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Common\\ONE.Common.csproj"
+              "C:\\Work\\AWC\\AWC 4.0\\GitHub\\ONE.Common\\ONE.Common.csproj": {
+                "projectPath": "C:\\Work\\AWC\\AWC 4.0\\GitHub\\ONE.Common\\ONE.Common.csproj"
               }
             }
           }
@@ -220,7 +230,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.303\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.305\\RuntimeIdentifierGraph.json"
         }
       }
     }

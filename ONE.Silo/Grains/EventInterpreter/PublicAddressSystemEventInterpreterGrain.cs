@@ -7,9 +7,6 @@ using ONE.Models.MessageContracts;
 using Orleans;
 using Orleans.Streams;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ONE.Silo.Grains.EventInterpreter
@@ -46,7 +43,7 @@ namespace ONE.Silo.Grains.EventInterpreter
 
         public async Task OnNextAsync(FrequencyAgileMessage publicAddressSystemMessage, StreamSequenceToken? token = null)
         {
-           
+
             IONEEventMessage oneEventMessage = new ONEEventMessage();
             oneEventMessage.EventInstanceGUID = Guid.Empty;
             oneEventMessage.Payload = "";

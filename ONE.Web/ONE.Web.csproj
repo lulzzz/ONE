@@ -30,9 +30,5 @@
     <ProjectReference Include="..\ONE.DataAccess\ONE.DataAccess.csproj" />
     <ProjectReference Include="..\ONE.GrainInterfaces\ONE.GrainInterfaces.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
 	
 </Project>

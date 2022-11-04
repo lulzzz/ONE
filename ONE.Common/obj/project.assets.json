@@ -689,11 +689,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Common\\ONE.Common.csproj",
+      "projectUniqueName": "C:\\Work\\AWC\\AWC 4.0\\GitHub\\ONE.Common\\ONE.Common.csproj",
       "projectName": "ONE.Common",
-      "projectPath": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Common\\ONE.Common.csproj",
+      "projectPath": "C:\\Work\\AWC\\AWC 4.0\\GitHub\\ONE.Common\\ONE.Common.csproj",
       "packagesPath": "C:\\Users\\Technerds Solutions\\.nuget\\packages\\",
-      "outputPath": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.Common\\obj\\",
+      "outputPath": "C:\\Work\\AWC\\AWC 4.0\\GitHub\\ONE.Common\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -758,7 +758,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.303\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.305\\RuntimeIdentifierGraph.json"
       }
     }
   }

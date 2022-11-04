@@ -1,8 +1,8 @@
-﻿using ONE.GrainInterfaces.EventProcessor;
-using ONE.Models.MessageContracts;
+﻿using ONE.Models.MessageContracts;
 using ONE.Silo.Grains.EventProcessor.Blockly;
 using Orleans;
 using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
 namespace ONE.Silo.Grains.OdinEventProcessorService.Blocks
 {
@@ -69,14 +69,14 @@ namespace ONE.Silo.Grains.OdinEventProcessorService.Blocks
         /// <summary>
         /// Executes the flow.
         /// </summary>
-        public override void ExecuteFlow()
+        public override async Task ExecuteFlow()
         {
             if (ONEEventFlowVariableDictionary == null)
             {
                 ONEEventFlowVariableDictionary = new ConcurrentDictionary<string, ONEEventFlowVariable>();
             }
             //Execute the flow
-            base.ExecuteFlow();
+            await base.ExecuteFlow();
         }
     }
 }

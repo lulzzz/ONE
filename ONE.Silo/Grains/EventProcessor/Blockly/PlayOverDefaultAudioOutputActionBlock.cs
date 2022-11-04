@@ -1,28 +1,25 @@
-﻿using ONE.Common.Helpers;
-using ONE.GrainInterfaces.EventProcessor;
-using ONE.Models.Domain;
-using ONE.Models.Enumerations;
-using ONE.Models.MessageContracts;
-using Orleans;
+﻿using ONE.EdgeCompute.TransportLayer;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace ONE.Silo.Grains.EventProcessor.Blockly
 {
-    [BlocklyConfigurationBlockInfo(BlockTypeName = "odin_action_play_over_default_audio_output")]
+    [BlocklyConfigurationBlockInfo(BlockTypeName = "one_action_play_over_default_audio_output")]
     public class PlayOverDefaultAudioOutputActionBlock : ONEConfigurationBlock
     {
         [BlocklyConfigurationValueInfo(ValueName = "audioInput")]
         public ONEConfigurationOutputBlock<MemoryStream> AudioInput { get; set; }
+        MqttTransportHelper _mqttTransportHelper;
 
 
-
-        protected override void Execute()
+        protected override async Task Execute()
         {
             try
             {
+
                 //Transmit over radio
-                PlayAudioInputOverDefaultAudioOutput();
+                await PlayAudioInputOverDefaultAudioOutput();
             }
             catch (Exception ex)
             {
@@ -33,16 +30,18 @@ namespace ONE.Silo.Grains.EventProcessor.Blockly
         /// <summary>
         /// Sends the text to speech over radio.
         /// </summary>
-        public async void PlayAudioInputOverDefaultAudioOutput()
+        public async Task PlayAudioInputOverDefaultAudioOutput()
         {
             try
             {
-                //Get an output from the audio input
-                using (MemoryStream audioMemoryStream = this.AudioInput.GetOutput())
-                {
+                await SetActiveEventFlowExecutionBlockState();
 
-                    IONESystemOutputDistributorGrain oneSystemOutputDistributorGrain = this.RootEventBlock.GrainFactory.GetGrain<IONESystemOutputDistributorGrain>("413d3d96-3d2f-4b13-b17c-b6ebc898f47a");
-                    await oneSystemOutputDistributorGrain.SendDataToSystemIO(audioMemoryStream.ToArray(), "63ee4d82-9fd2-40a5-b7e3-9c8a8c83bc64");
+                //Get an output from the audio input
+                using (MemoryStream audioMemoryStream = await this.AudioInput.GetOutput())
+                {
+                    _mqttTransportHelper = new MqttTransportHelper();
+                    _mqttTransportHelper.OpenMqttTransportConnection(Guid.NewGuid().ToString());
+                    await _mqttTransportHelper.Publish(audioMemoryStream.ToArray(), "a19a61ab-8535-46b8-a2c5-0c2ddc71c398");
                 }
             }
             catch (Exception ex)

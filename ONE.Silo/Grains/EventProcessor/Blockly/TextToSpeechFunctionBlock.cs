@@ -7,10 +7,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace ONE.Silo.Grains.EventProcessor.Blockly
 {
-    [BlocklyConfigurationBlockInfo(BlockTypeName = "odin_function_text_to_speech")]
+    [BlocklyConfigurationBlockInfo(BlockTypeName = "one_function_text_to_speech")]
     public class TextToSpeechFunctionBlock : ONEConfigurationOutputBlock<MemoryStream>
     {
         [BlocklyConfigurationValueInfo(ValueName = "textToSpeak")]
@@ -22,7 +23,7 @@ namespace ONE.Silo.Grains.EventProcessor.Blockly
         [BlocklyConfigurationFieldInfo(FieldName = "millisecondsToTrimFromEnd")]
         public int MillisecondsToTrimFromEnd { get; set; }
 
-        public override MemoryStream GetOutput()
+        public override async Task<MemoryStream> GetOutput()
         {
             try
             {
@@ -32,7 +33,7 @@ namespace ONE.Silo.Grains.EventProcessor.Blockly
                 MemoryStream outputStream = new MemoryStream();
 
                 //Get the output text
-                string textToSpeakOutput = TextToSpeak.GetOutput();
+                string textToSpeakOutput = await TextToSpeak.GetOutput();
 
                 //Get a regex match collection of all of the prerecorded audio tokens that are in the text to speech string
                 MatchCollection prerecordedAudioTokenMatches = Regex.Matches(textToSpeakOutput, @"(\[PAC:.*?\])");

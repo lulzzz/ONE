@@ -9,14 +9,21 @@
 		</PropertyGroup>
 
 		<ItemGroup>
+				<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.10" />
+				<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.10">
+				  <PrivateAssets>all</PrivateAssets>
+				  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+				</PackageReference>
 				<PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0" />
 				<PackageReference Include="Microsoft.Orleans.OrleansTelemetryConsumers.Counters" Version="3.6.2" />
 				<PackageReference Include="Microsoft.Orleans.Persistence.AzureStorage" Version="3.6.3" />
+				<PackageReference Include="Microsoft.Orleans.Reminders.AzureStorage" Version="3.5.1" />
 				<PackageReference Include="OrleansDashboard.Core" Version="3.1.0" />
 		</ItemGroup>
 
 		<ItemGroup>
 				<ProjectReference Include="..\ONE.Common\ONE.Common.csproj" />
+				<ProjectReference Include="..\ONE.DataAccess\ONE.DataAccess.csproj" />
 				<ProjectReference Include="..\ONE.Silo\ONE.Silo.csproj" />
 				<ProjectReference Include="..\ONE.Web\ONE.Web.csproj" />
 		</ItemGroup>

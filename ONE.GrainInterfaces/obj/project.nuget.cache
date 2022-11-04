@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "Xq7Diz4USdq+mK8g4R1e1Hl++Pwce4YH4QA7f7UAx+vruZtHbwxzExAXJXv9YDMBkGUJgH9G4jVmPgXh8XGY2w==",
+  "dgSpecHash": "0pd7tO0/zMz2/EOMnRwMl8vHJRERVGQmK1sIQdI7bUSojPZQ67DzezyinfMmHZZ0cWlTGCwvp0MquYb5fD300A==",
   "success": true,
-  "projectFilePath": "C:\\Work\\AWC\\AWC 4.0\\ONE\\ONE.GrainInterfaces\\ONE.GrainInterfaces.csproj",
+  "projectFilePath": "C:\\Work\\AWC\\AWC 4.0\\GitHub\\ONE.GrainInterfaces\\ONE.GrainInterfaces.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Technerds Solutions\\.nuget\\packages\\messagepack.annotations\\2.4.35\\messagepack.annotations.2.4.35.nupkg.sha512",
     "C:\\Users\\Technerds Solutions\\.nuget\\packages\\microsoft.aspnetcore.connections.abstractions\\6.0.0\\microsoft.aspnetcore.connections.abstractions.6.0.0.nupkg.sha512",
