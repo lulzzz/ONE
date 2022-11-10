@@ -8,6 +8,7 @@ namespace ONE.DataAccess.Models
         public StatusType()
         {
             Initiators = new HashSet<Initiator>();
+            OutputNodes = new HashSet<OutputNode>();
         }
 
         public int StatusTypeCode { get; set; }
@@ -15,5 +16,6 @@ namespace ONE.DataAccess.Models
         public string Description { get; set; }
 
         public virtual ICollection<Initiator> Initiators { get; set; }
+        public virtual ICollection<OutputNode> OutputNodes { get; set; }
     }
 }

@@ -8,6 +8,7 @@ namespace ONE.DataAccess.Models
         public MarketType()
         {
             Customers = new HashSet<Customer>();
+            ApplicationTypeCodes = new HashSet<ApplicationType>();
         }
 
         public int MarketTypeCode { get; set; }
@@ -16,5 +17,7 @@ namespace ONE.DataAccess.Models
         public string EnumName { get; set; }
 
         public virtual ICollection<Customer> Customers { get; set; }
+
+        public virtual ICollection<ApplicationType> ApplicationTypeCodes { get; set; }
     }
 }

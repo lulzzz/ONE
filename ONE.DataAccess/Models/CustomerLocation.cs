@@ -7,7 +7,10 @@ namespace ONE.DataAccess.Models
     {
         public CustomerLocation()
         {
+            Appliances = new HashSet<Appliance>();
             CustomerLocationSections = new HashSet<CustomerLocationSection>();
+            PersonGroups = new HashSet<PersonGroup>();
+            SystemUsers = new HashSet<SystemUser>();
         }
 
         public Guid CustomerLocationGuid { get; set; }
@@ -22,6 +25,9 @@ namespace ONE.DataAccess.Models
 
         public virtual Customer CustomerGu { get; set; }
         public virtual State StateCodeNavigation { get; set; }
+        public virtual ICollection<Appliance> Appliances { get; set; }
         public virtual ICollection<CustomerLocationSection> CustomerLocationSections { get; set; }
+        public virtual ICollection<PersonGroup> PersonGroups { get; set; }
+        public virtual ICollection<SystemUser> SystemUsers { get; set; }
     }
 }

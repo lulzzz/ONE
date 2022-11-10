@@ -7,7 +7,11 @@ namespace ONE.DataAccess.Models
     {
         public CustomerLocationSection()
         {
+            FragmentLogs = new HashSet<FragmentLog>();
             Initiators = new HashSet<Initiator>();
+            KeyPerformanceIndicatorTypes = new HashSet<KeyPerformanceIndicatorType>();
+            OutputNodes = new HashSet<OutputNode>();
+            PccPatientCustomerLocationSections = new HashSet<PccPatientCustomerLocationSection>();
         }
 
         public Guid CustomerLocationSectionGuid { get; set; }
@@ -29,6 +33,10 @@ namespace ONE.DataAccess.Models
         public DateTime? UpdatedOn { get; set; }
 
         public virtual CustomerLocation CustomerLocationGu { get; set; }
+        public virtual ICollection<FragmentLog> FragmentLogs { get; set; }
         public virtual ICollection<Initiator> Initiators { get; set; }
+        public virtual ICollection<KeyPerformanceIndicatorType> KeyPerformanceIndicatorTypes { get; set; }
+        public virtual ICollection<OutputNode> OutputNodes { get; set; }
+        public virtual ICollection<PccPatientCustomerLocationSection> PccPatientCustomerLocationSections { get; set; }
     }
 }

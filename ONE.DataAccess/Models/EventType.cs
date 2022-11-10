@@ -7,7 +7,13 @@ namespace ONE.DataAccess.Models
     {
         public EventType()
         {
+            ActiveAlarmDashboardCaches = new HashSet<ActiveAlarmDashboardCache>();
+            ActiveAlarmTrackingHistories = new HashSet<ActiveAlarmTrackingHistory>();
+            ActiveAlarmTrackings = new HashSet<ActiveAlarmTracking>();
             ActiveEventFlowExecutionTrackings = new HashSet<ActiveEventFlowExecutionTracking>();
+            ApplicationTypeEventTypeAliasConfigurationDetails = new HashSet<ApplicationTypeEventTypeAliasConfigurationDetail>();
+            SystemHealthDashboardCaches = new HashSet<SystemHealthDashboardCache>();
+            InitiatorTypeCodes = new HashSet<InitiatorType>();
         }
 
         public int EventTypeCode { get; set; }
@@ -18,6 +24,13 @@ namespace ONE.DataAccess.Models
         public bool? KeepEventFlowActive { get; set; }
         public bool? CreateEventFlowWhenNotWired { get; set; }
 
+        public virtual ICollection<ActiveAlarmDashboardCache> ActiveAlarmDashboardCaches { get; set; }
+        public virtual ICollection<ActiveAlarmTrackingHistory> ActiveAlarmTrackingHistories { get; set; }
+        public virtual ICollection<ActiveAlarmTracking> ActiveAlarmTrackings { get; set; }
         public virtual ICollection<ActiveEventFlowExecutionTracking> ActiveEventFlowExecutionTrackings { get; set; }
+        public virtual ICollection<ApplicationTypeEventTypeAliasConfigurationDetail> ApplicationTypeEventTypeAliasConfigurationDetails { get; set; }
+        public virtual ICollection<SystemHealthDashboardCache> SystemHealthDashboardCaches { get; set; }
+
+        public virtual ICollection<InitiatorType> InitiatorTypeCodes { get; set; }
     }
 }
