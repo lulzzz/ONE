@@ -109,7 +109,27 @@ namespace ONE.DataAccess.Repositories
             return ActiveEventFlowExecutionTracks;
         }
 
+        public void DeleteActiveEventFlowExecutionTracking(ActiveEventFlowExecutionTrackingInfo activeEventFlowExecutionTrackingInfo)
+        {
+            try
+            {
+                ActiveEventFlowExecutionTracking activeEventFlowExecutionTracking = _oneContext.ActiveEventFlowExecutionTrackings.Where(x => x.InitiatorGuid == activeEventFlowExecutionTrackingInfo.InitiatorGuid
+                                                                               && x.EventFlowGuid == activeEventFlowExecutionTrackingInfo.EventFlowGuid
+                                                                               && x.EventTypeCode == activeEventFlowExecutionTrackingInfo.EventTypeCode).FirstOrDefault();
+                if (activeEventFlowExecutionTracking != null)
+                {
+                    _oneContext.ActiveEventFlowExecutionTrackings.Attach(activeEventFlowExecutionTracking);
+                    _oneContext.ActiveEventFlowExecutionTrackings.Remove(activeEventFlowExecutionTracking);
+                    _oneContext.SaveChanges();
+                }
 
+            }
+            catch
+            {
+                throw;
+            }
+
+        }
 
     }
 }

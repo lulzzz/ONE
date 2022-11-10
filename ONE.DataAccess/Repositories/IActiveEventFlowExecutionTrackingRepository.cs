@@ -9,6 +9,7 @@ namespace ONE.DataAccess.Repositories
         void UpdateActiveEventFlowExecutionTracking(ActiveEventFlowExecutionTrackingInfo activeEventFlowExecutionTrackingInfo);
         List<ActiveEventFlowExecutionTrackingInfo> GetActiveEventFlowExecutionTracking();
         ActiveEventFlowExecutionTrackingInfo GetActiveEventFlowExecutionTracking(ActiveEventFlowExecutionTrackingInfo activeEventFlowExecutionTrackingInfo);
+        void DeleteActiveEventFlowExecutionTracking(ActiveEventFlowExecutionTrackingInfo activeEventFlowExecutionTrackingInfo);
 
     }
 }

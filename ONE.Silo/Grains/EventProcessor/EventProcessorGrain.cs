@@ -30,14 +30,12 @@ namespace ONE.Silo.Grains.EventProcessor
         private Dictionary<string, Type> _configurationBlockTypeMap;
         private IEventFlowRepository _eventFlowRepository = null;
         private IActiveEventFlowExecutionTrackingRepository _activeEventFlowExecutionTrackingRepository = null;
-        private readonly IPersistentState<EventFlow> _eventFlow;
+        private EventFlow _eventFlow;
 
 
         public EventProcessorGrain(IEventFlowRepository eventFlowRepository,
-            IActiveEventFlowExecutionTrackingRepository eventFlowActivationBlockTrackRepository,
-            [PersistentState("eventFlow", "oneDataStore")] IPersistentState<EventFlow> eventFlow)
+            IActiveEventFlowExecutionTrackingRepository eventFlowActivationBlockTrackRepository)
         {
-            _eventFlow = eventFlow;
             _eventFlowRepository = eventFlowRepository;
             _activeEventFlowExecutionTrackingRepository = eventFlowActivationBlockTrackRepository;
         }
@@ -68,6 +66,8 @@ namespace ONE.Silo.Grains.EventProcessor
         {
             Logger.LogInformation("ProcessExecutionFlow");
 
+
+
             EventFlowInfo eventFlowInfo = _eventFlowRepository.GetEventFlowInfoByEventFlowGuid(oneEventMessage.EventFlowGUID);
             ActiveEventFlowExecutionTrackingInfo activeEventFlowExecutionTrackingInfo = new ActiveEventFlowExecutionTrackingInfo();
             activeEventFlowExecutionTrackingInfo.InitiatorGuid = oneEventMessage.InitiatorGUID;
@@ -82,6 +82,8 @@ namespace ONE.Silo.Grains.EventProcessor
             activeEventFlowExecutionTrackingInfo.HaltedByEventFlowInstanceGuid = oneEventMessage.HaltedByEventFlowInstanceGUID;
             activeEventFlowExecutionTrackingInfo.StopAudioOnEventFlowHalt = oneEventMessage.StopAudioOnEventFlowHalt;
             _activeEventFlowExecutionTrackingRepository.AddActiveEventFlowExecutionTracking(activeEventFlowExecutionTrackingInfo);
+
+            //Not creating Reminder for Clear events
 
             string grainReminderName = $"{activeEventFlowExecutionTrackingInfo.InitiatorGuid}/{activeEventFlowExecutionTrackingInfo.EventFlowGuid}/{activeEventFlowExecutionTrackingInfo.EventTypeCode}/reminder";
             _reminder = await RegisterOrUpdateReminder(grainReminderName, TimeSpan.FromSeconds(3), TimeSpan.FromMinutes(1));
@@ -131,7 +133,7 @@ namespace ONE.Silo.Grains.EventProcessor
             {
                 //Extract the block type name, it should be the event type name strnig with the capitals replaced with an underscore and the odin_event prefix added
                 //such that CapCodeTextMessageReceived becomes odin_event_cap_code_text_message_received
-                string blockTypeName = string.Format("one_event{0}", Regex.Replace(oneEventMessage.EventType.ToString(), "[A-Z]", "_$0").ToLower());
+                string blockTypeName = string.Format("odin_event{0}", Regex.Replace(oneEventMessage.EventType.ToString(), "[A-Z]", "_$0").ToLower());
 
                 //Logger.Instance.LogDebug($"Initiating Event Flow from Event: {blockTypeName}: InitiatorGUID {message.InitiatorGUID} - EventFlowGUID: {message.EventFlowGUID}");
                 XmlDocument doc = new XmlDocument();
@@ -166,10 +168,8 @@ namespace ONE.Silo.Grains.EventProcessor
 
                     //Create a new event flow for the root event block and add it to the active event flows
                     EventFlow flowToInitiate = new EventFlow(rootEventBlock, oneEventMessage.GlobalTrackingGuid, oneEventMessage.EventInstanceGUID, oneEventMessage.EventFlowGUID, oneEventMessage.InitiatorGUID, oneEventMessage.EventType, flowConfigurationXml);
+                    _eventFlow = flowToInitiate;
 
-                    //_eventFlow.State = flowToInitiate;
-
-                    //await _eventFlow.WriteStateAsync();
                     flowToInitiate.EventFlowCompleted += FlowToInitiate_EventFlowCompleted;
                     //  _activeEventFlows.Add(flowToInitiate);
 
@@ -177,6 +177,7 @@ namespace ONE.Silo.Grains.EventProcessor
                     //  flowToInitiate.EventFlowTask.Start();
 
                     await flowToInitiate.ExecuteFlow();
+                    await UnregisterGrainReminder($"{this.GrainId}/reminder");
                 }
                 else
                 {
@@ -191,8 +192,26 @@ namespace ONE.Silo.Grains.EventProcessor
         {
 
         }
+        public async Task UnregisterGrainReminder(string grainReminderName)
+        {
+            string[] splitReminderName = grainReminderName.Split('/');
+            string initiatorGuid = splitReminderName[0];
+            string eventFlowGuid = splitReminderName[1];
+            string eventTypeCode = splitReminderName[2];
 
+            ActiveEventFlowExecutionTrackingInfo activeEventFlowExecutionTrackingInfo = new ActiveEventFlowExecutionTrackingInfo();
+            activeEventFlowExecutionTrackingInfo.InitiatorGuid = new Guid(initiatorGuid);
+            activeEventFlowExecutionTrackingInfo.EventFlowGuid = new Guid(eventFlowGuid);
+            activeEventFlowExecutionTrackingInfo.EventTypeCode = Convert.ToInt32(eventTypeCode);
+            _activeEventFlowExecutionTrackingRepository.DeleteActiveEventFlowExecutionTracking(activeEventFlowExecutionTrackingInfo);
 
+            this._eventFlow.RootEventBlock.IsEventFlowHalted = true;
+            IGrainReminder grainReminder = await this.GetReminder(grainReminderName);
+            if (grainReminder != null)
+            {
+                await this.UnregisterReminder(grainReminder);
+            }
+        }
 
 
         #region Event Flow Blocky State Building
@@ -407,17 +426,17 @@ namespace ONE.Silo.Grains.EventProcessor
             string blockTypeName = GetBlockTypeName(currentNode);
 
             //Get the type 
-            Type odinConfigurationBlockType = _configurationBlockTypeMap[blockTypeName];
+            Type oneConfigurationBlockType = _configurationBlockTypeMap[blockTypeName];
 
             //Return a new instance of that type
-            ONEConfigurationBlock currentBlock = Activator.CreateInstance(odinConfigurationBlockType) as ONEConfigurationBlock;
+            ONEConfigurationBlock currentBlock = Activator.CreateInstance(oneConfigurationBlockType) as ONEConfigurationBlock;
             currentBlock.Id = currentNode.Attributes["id"].Value;
             //Check to see if there are any statement nodes, and if so build those up
             XmlNodeList statementNodes = currentNode.SelectNodes("./ns:statement", nsmgr);
             if (statementNodes != null && statementNodes.Count > 0)
             {
                 //Get all of the statement properties for current block
-                IEnumerable<PropertyInfo> statementProperties = odinConfigurationBlockType.GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(BlocklyConfigurationStatementInfoAttribute)));
+                IEnumerable<PropertyInfo> statementProperties = oneConfigurationBlockType.GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(BlocklyConfigurationStatementInfoAttribute)));
 
                 //Iterate the statement nodes and build them up
                 foreach (XmlNode statementNode in statementNodes)
@@ -451,7 +470,7 @@ namespace ONE.Silo.Grains.EventProcessor
             {
 
                 //Get all of the field properties for current block
-                IEnumerable<PropertyInfo> fieldProperties = odinConfigurationBlockType.GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(BlocklyConfigurationFieldInfoAttribute)));
+                IEnumerable<PropertyInfo> fieldProperties = oneConfigurationBlockType.GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(BlocklyConfigurationFieldInfoAttribute)));
 
                 //Iterate the field nodes and search for matching properties
                 foreach (XmlNode fieldNode in fieldNodes)
@@ -489,7 +508,7 @@ namespace ONE.Silo.Grains.EventProcessor
             if (valueNodes != null && valueNodes.Count > 0)
             {
                 //Get all of the field properties for current block
-                IEnumerable<PropertyInfo> valueProperties = odinConfigurationBlockType.GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(BlocklyConfigurationValueInfoAttribute)));
+                IEnumerable<PropertyInfo> valueProperties = oneConfigurationBlockType.GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(BlocklyConfigurationValueInfoAttribute)));
 
                 //Iterate the value nodes and search for matching properties
                 foreach (XmlNode valueNode in valueNodes)
@@ -505,13 +524,13 @@ namespace ONE.Silo.Grains.EventProcessor
                         XmlNode blockNode = valueNode.SelectSingleNode("./ns:block", nsmgr);
 
                         //Build the block graph for the current block node.
-                        ONEConfigurationBlock odinConfigurationBlock = BuildConfigurationBlockFlowGraph(blockNode, nsmgr);
+                        ONEConfigurationBlock oneConfigurationBlock = BuildConfigurationBlockFlowGraph(blockNode, nsmgr);
 
 
                         PropertyInfo valueProperty;
-                        if (odinConfigurationBlock != null && valueNodeProperties != null && valueNodeProperties.Count() > 1)
+                        if (oneConfigurationBlock != null && valueNodeProperties != null && valueNodeProperties.Count() > 1)
                         {
-                            valueProperty = valueNodeProperties.Where(x => ((BlocklyConfigurationValueInfoAttribute)x.GetCustomAttribute(typeof(BlocklyConfigurationValueInfoAttribute))).ValueType == odinConfigurationBlock.GetType().BaseType.GenericTypeArguments[0]).FirstOrDefault();
+                            valueProperty = valueNodeProperties.Where(x => ((BlocklyConfigurationValueInfoAttribute)x.GetCustomAttribute(typeof(BlocklyConfigurationValueInfoAttribute))).ValueType == oneConfigurationBlock.GetType().BaseType.GenericTypeArguments[0]).FirstOrDefault();
                         }
                         else
                         {
@@ -522,7 +541,7 @@ namespace ONE.Silo.Grains.EventProcessor
                         //If it is, set it to null, otherwise set the current block value property to the configuration block.
                         //This gives us the ability to create optional parameters in blocks and fill in the holes
                         //with Default Input Blocks.
-                        if (odinConfigurationBlock.GetType().IsSubclassOf(typeof(ONEConfigurationOutputBlock<OptionalInput>)))
+                        if (oneConfigurationBlock.GetType().IsSubclassOf(typeof(ONEConfigurationOutputBlock<OptionalInput>)))
                         {
                             //It is an Optional Input, so make the value property null.
                             valueProperty.SetValue(currentBlock, null);
@@ -530,7 +549,7 @@ namespace ONE.Silo.Grains.EventProcessor
                         else
                         {
                             //Try to set the value using a type converter
-                            valueProperty.SetValue(currentBlock, odinConfigurationBlock);
+                            valueProperty.SetValue(currentBlock, oneConfigurationBlock);
                         }
                     }
                 }
@@ -588,34 +607,34 @@ namespace ONE.Silo.Grains.EventProcessor
             {
                 //We need to traverse the blocks inside statements.  This works a bit differently than just the next block because we need to "get inside" the statement
 
-                //Find all OdinConfigurationBlockStatement properties
+                //Find all ONEConfigurationBlockStatement properties
                 //Check to see if the FirstStatementBlock property is not null, and if not, call the SetRootEventBlock on it
-                List<PropertyInfo> odinConfigurationBlockStatementProperties = currentBlock.GetType().GetProperties().Where(x => x.PropertyType == typeof(ONEConfigurationBlockStatement)).ToList();
+                List<PropertyInfo> oneConfigurationBlockStatementProperties = currentBlock.GetType().GetProperties().Where(x => x.PropertyType == typeof(ONEConfigurationBlockStatement)).ToList();
 
                 //Iterate all of the properties and see if the OdinConfigurationBlockStatement properties are not null
-                foreach (PropertyInfo odinConfigurationBlockStatementProperty in odinConfigurationBlockStatementProperties)
+                foreach (PropertyInfo oneConfigurationBlockStatementProperty in oneConfigurationBlockStatementProperties)
                 {
-                    ONEConfigurationBlockStatement odinConfigurationBlockStatement = odinConfigurationBlockStatementProperty.GetValue(currentBlock) as ONEConfigurationBlockStatement;
+                    ONEConfigurationBlockStatement oneConfigurationBlockStatement = oneConfigurationBlockStatementProperty.GetValue(currentBlock) as ONEConfigurationBlockStatement;
 
-                    if (odinConfigurationBlockStatement != null)
+                    if (oneConfigurationBlockStatement != null)
                     {
                         //Its not null, so see if the first statement block property is not null, and if not, set its root element
-                        SetRootEventBlockAllProperties(odinConfigurationBlockStatement, rootEventBlock);
+                        SetRootEventBlockAllProperties(oneConfigurationBlockStatement, rootEventBlock);
                     }
                 }
 
-                //Set the root event block for all of the inline value properties that are assignable from OdinConfigurationBlock
+                //Set the root event block for all of the inline value properties that are assignable from ONEConfigurationBlock
                 SetRootEventBlockAllProperties(currentBlock, rootEventBlock);
             }
             else
             {
-                //Not a statement block, so try to set the root event block on all properties that are assignable from OdinConfigurationBlock
+                //Not a statement block, so try to set the root event block on all properties that are assignable from ONEConfigurationBlock
                 SetRootEventBlockAllProperties(currentBlock, rootEventBlock);
             }
         }
 
         /// <summary>
-        /// Sets the root event block all properties that are assignable from OdinConfigurationBlock
+        /// Sets the root event block all properties that are assignable from ONEConfigurationBlock
         /// </summary>
         /// <param name="currentObject">The current object.</param>
         /// <param name="rootEventBlock">The root event block.</param>
@@ -624,25 +643,25 @@ namespace ONE.Silo.Grains.EventProcessor
             //Get all of the public instance properties
             PropertyInfo[] propertyInfos = currentObject.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
 
-            //Iterate all of the properties to find those properties that inherit from OdinConfigurationBlock
+            //Iterate all of the properties to find those properties that inherit from ONEConfigurationBlock
             foreach (PropertyInfo propertyInfo in propertyInfos)
             {
                 if (propertyInfo.Name != "RootEventBlock")
                 {
-                    //Determine if this property is OdinConfigurationBlock or is inherited from OdinConfigurationBlock
+                    //Determine if this property is ONEConfigurationBlock or is inherited from ONEConfigurationBlock
                     if (typeof(ONEConfigurationBlock).IsAssignableFrom(propertyInfo.PropertyType))
                     {
                         //It is, so get the property value
-                        ONEConfigurationBlock odinConfigurationBlockPropertyValue = propertyInfo.GetValue(currentObject) as ONEConfigurationBlock;
+                        ONEConfigurationBlock oneConfigurationBlockPropertyValue = propertyInfo.GetValue(currentObject) as ONEConfigurationBlock;
 
                         //Make sure the property value is not null
-                        if (odinConfigurationBlockPropertyValue != null)
+                        if (oneConfigurationBlockPropertyValue != null)
                         {
                             //It's not, so set the root event block for this OdinConfigurationBlock property
-                            SetRootEventBlock(odinConfigurationBlockPropertyValue, rootEventBlock);
+                            SetRootEventBlock(oneConfigurationBlockPropertyValue, rootEventBlock);
                         }
                     }
-                    //Or of it is an array whose array type is OdinConfigurationBlock or is inherited from OdinConfigurationBlock
+                    //Or of it is an array whose array type is ONEConfigurationBlock or is inherited from ONEConfigurationBlock
                     else if (propertyInfo.PropertyType.IsArray && typeof(ONEConfigurationBlock).IsAssignableFrom(propertyInfo.PropertyType.GetElementType()))
                     {
                         Array arrayPropertyValue = propertyInfo.GetValue(currentObject) as Array;
@@ -650,26 +669,26 @@ namespace ONE.Silo.Grains.EventProcessor
                         //It is an array of the correct type
                         foreach (object element in arrayPropertyValue)
                         {
-                            ONEConfigurationBlock odinConfigurationBlockPropertyValue = element as ONEConfigurationBlock;
+                            ONEConfigurationBlock oneConfigurationBlockPropertyValue = element as ONEConfigurationBlock;
 
                             //Make sure the property value is not null
-                            if (odinConfigurationBlockPropertyValue != null)
+                            if (oneConfigurationBlockPropertyValue != null)
                             {
                                 //It's not, so set the root event block for this OdinConfigurationBlock property
-                                SetRootEventBlock(odinConfigurationBlockPropertyValue, rootEventBlock);
+                                SetRootEventBlock(oneConfigurationBlockPropertyValue, rootEventBlock);
                             }
                         }
                     }
                     else if (propertyInfo.PropertyType == typeof(ONEConfigurationBlockStatement))
                     {
                         //It is, so get the property value
-                        ONEConfigurationBlockStatement odinConfigurationStatementBlockPropertyValue = propertyInfo.GetValue(currentObject) as ONEConfigurationBlockStatement;
+                        ONEConfigurationBlockStatement oneConfigurationStatementBlockPropertyValue = propertyInfo.GetValue(currentObject) as ONEConfigurationBlockStatement;
 
                         //Make sure the property value is not null
-                        if (odinConfigurationStatementBlockPropertyValue != null)
+                        if (oneConfigurationStatementBlockPropertyValue != null)
                         {
-                            //It's not, so set the root event block for this OdinConfigurationBlock property
-                            SetRootEventBlock(odinConfigurationStatementBlockPropertyValue.FirstStatementBlock, rootEventBlock);
+                            //It's not, so set the root event block for this ONEConfigurationBlock property
+                            SetRootEventBlock(oneConfigurationStatementBlockPropertyValue.FirstStatementBlock, rootEventBlock);
                         }
                     }
 

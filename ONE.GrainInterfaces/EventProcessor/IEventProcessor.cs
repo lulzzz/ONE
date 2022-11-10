@@ -9,5 +9,9 @@ namespace ONE.GrainInterfaces.EventProcessor
     {
         [AlwaysInterleave]
         Task ProcessExecutionFlow(IONEEventMessage oneEventMessage);
+
+
+        [AlwaysInterleave]
+        Task UnregisterGrainReminder(string grainReminderName);
     }
 }
