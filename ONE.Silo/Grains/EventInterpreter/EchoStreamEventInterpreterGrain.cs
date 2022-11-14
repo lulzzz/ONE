@@ -56,8 +56,8 @@ namespace ONE.Silo.Grains.EventInterpreter
 
         public async Task OnNextAsync(EchoStreamMessage echoStreamMessage, StreamSequenceToken? token = null)
         {
-
-            var grain = GrainFactory.GetGrain<IEventInterpreterRouterGrain>($"{GrainId}_EventInterpreterRouter");
+            string applianceGuid = "6bf6f5a3-7d89-465d-b083-9641b493053d";
+            var grain = GrainFactory.GetGrain<IEventInterpreterRouterGrain>($"{applianceGuid}_EventInterpreterRouter");
             List<InitiatorInfo> initiatorInfos = await grain.GetInterpreterInitiatorInfos();
 
             InitiatorInfo? initiatorInfo = initiatorInfos.Where(x => x.ConfigurationData is EchoStreamConfigurationData && ((EchoStreamConfigurationData)x.ConfigurationData).SerialNumber == echoStreamMessage?.OriginatorUniqueId).FirstOrDefault();
@@ -129,6 +129,15 @@ namespace ONE.Silo.Grains.EventInterpreter
                         //The current message does not have the flag, so try go get the "has flag" event so that we can send it's opposite event
                         if (activationEvent != null)
                         {
+
+
+                            oneEventMessage.EventInstanceGUID = trackedEventInfo.EventInstanceGUID;
+                            oneEventMessage.Payload = "";
+                            oneEventMessage.InitiatorGUID = initiatorInfo.InitiatorGuid;
+                            oneEventMessage.EventFlowGUID = initiatorInfo.EventFlowGuid;
+                            oneEventMessage.EventType = activationClearEventType.Value;
+                            oneEventMessage.GlobalTrackingGuid = new Guid();
+                            await SendEventMessageForProcessing(oneEventMessage);
 
                             initiatorEventFlowTrackingItem?.ActiveEvents.Remove(activationEvent);
 

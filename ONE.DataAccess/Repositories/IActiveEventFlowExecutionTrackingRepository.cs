@@ -10,6 +10,5 @@ namespace ONE.DataAccess.Repositories
         List<ActiveEventFlowExecutionTrackingInfo> GetActiveEventFlowExecutionTracking();
         ActiveEventFlowExecutionTrackingInfo GetActiveEventFlowExecutionTracking(ActiveEventFlowExecutionTrackingInfo activeEventFlowExecutionTrackingInfo);
         void DeleteActiveEventFlowExecutionTracking(ActiveEventFlowExecutionTrackingInfo activeEventFlowExecutionTrackingInfo);
-
     }
 }

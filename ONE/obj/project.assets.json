@@ -3276,7 +3276,8 @@
         "dependencies": {
           "Microsoft.EntityFrameworkCore.SqlServer": "6.0.10",
           "Newtonsoft.Json": "13.0.1",
-          "ONE.Models": "1.0.0"
+          "ONE.Models": "1.0.0",
+          "System.Collections": "4.3.0"
         },
         "compile": {
           "bin/placeholder/ONE.DataAccess.dll": {}
@@ -3292,6 +3293,7 @@
           "Microsoft.Orleans.Runtime.Abstractions": "3.6.2",
           "ONE.Common": "1.0.0",
           "ONE.Models": "1.0.0",
+          "System.Threading.Tasks": "4.3.0",
           "UUIDNext": "1.1.1"
         },
         "compile": {
@@ -3307,6 +3309,7 @@
         "dependencies": {
           "MessagePack.Annotations": "2.4.35",
           "Microsoft.Orleans.Core.Abstractions": "3.6.2",
+          "Newtonsoft.Json": "13.0.1",
           "ONE.Common": "1.0.0",
           "System.Windows.Extensions": "6.0.0"
         },
@@ -10336,7 +10339,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.305\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.306\\RuntimeIdentifierGraph.json"
       }
     }
   }

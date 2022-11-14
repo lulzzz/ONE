@@ -168,8 +168,9 @@ namespace ONE.Silo.Grains.SystemInput
 
         private async Task<string> GetTargetEventInterpreterGrain(TrackedEchoStreamMessage trackedMessage)
         {
-            var eventInterpreterRouterGrain = GrainFactory.GetGrain<IEventInterpreterRouterGrain>($"{GrainIdAsGuid}_EventInterpreterRouter");
-            string eventInterpreterName = await Task.FromResult(eventInterpreterRouterGrain.GetMatchingEventInterpreterName(trackedMessage.EchoStreamMessage.OriginatorUniqueId)).Result;
+            string applianceGuid = "6bf6f5a3-7d89-465d-b083-9641b493053d";
+            var eventInterpreterRouterGrain = GrainFactory.GetGrain<IEventInterpreterRouterGrain>($"{applianceGuid}_EventInterpreterRouter");
+            string eventInterpreterName = await eventInterpreterRouterGrain.GetMatchingEventInterpreterName(trackedMessage.EchoStreamMessage.OriginatorUniqueId);
             return eventInterpreterName;
         }
     }

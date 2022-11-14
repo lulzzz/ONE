@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "k2c+213Y1D/Rg2y6otUxY67QStq9J1hixPTTY6Awz920vktg/ZwsKxxXALCPCOZkI5+P9gueD7b11NOusl0Rfw==",
+  "dgSpecHash": "eB4xhs45lK5u1cq0yNtzV2XHespLvqIwmAdwUi+U6rm4pBoJ1IiIkS9jWjA8/oV1WctMhD9CHbVOthMuJ2iQFA==",
   "success": true,
   "projectFilePath": "C:\\Work\\AWC\\AWC 4.0\\GitHub\\ONE.Models\\ONE.Models.csproj",
   "expectedPackageFiles": [
@@ -17,6 +17,7 @@
     "C:\\Users\\Technerds Solutions\\.nuget\\packages\\naudio.midi\\2.1.0\\naudio.midi.2.1.0.nupkg.sha512",
     "C:\\Users\\Technerds Solutions\\.nuget\\packages\\naudio.wasapi\\2.1.0\\naudio.wasapi.2.1.0.nupkg.sha512",
     "C:\\Users\\Technerds Solutions\\.nuget\\packages\\naudio.winmm\\2.1.0\\naudio.winmm.2.1.0.nupkg.sha512",
+    "C:\\Users\\Technerds Solutions\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512",
     "C:\\Users\\Technerds Solutions\\.nuget\\packages\\system.drawing.common\\6.0.0\\system.drawing.common.6.0.0.nupkg.sha512",
     "C:\\Users\\Technerds Solutions\\.nuget\\packages\\system.memory\\4.5.4\\system.memory.4.5.4.nupkg.sha512",
     "C:\\Users\\Technerds Solutions\\.nuget\\packages\\system.security.accesscontrol\\4.7.0\\system.security.accesscontrol.4.7.0.nupkg.sha512",

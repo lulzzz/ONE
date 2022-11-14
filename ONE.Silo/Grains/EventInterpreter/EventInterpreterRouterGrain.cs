@@ -59,5 +59,16 @@ namespace ONE.Silo.Grains.EventInterpreter
             }
             return Task.FromResult(eventInterpreterTypeEnumName);
         }
+
+        public async Task<InitiatorInfo> GetInitiatorInfo(Guid initiatorGuid)
+        {
+            string eventInterpreterTypeEnumName = string.Empty;
+            List<InitiatorInfo> initiatorInfoList = await Task.FromResult(_initiatorInfos.State);
+
+            InitiatorInfo? initiatorInfo = initiatorInfoList.Where(x => x.InitiatorGuid == initiatorGuid).FirstOrDefault();
+
+
+            return await Task.FromResult(initiatorInfo);
+        }
     }
 }
